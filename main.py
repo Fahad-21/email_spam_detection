@@ -74,3 +74,9 @@ accuracy_on_training_data = accuracy_score(Y_train, prediction_on_training_data)
 
 print("Accuracy on traininf data: ", accuracy_on_training_data)
 
+# prediction on test data
+
+prediction_on_test_data = model.predict(X_test_features)
+accuracy_on_test_data = accuracy_score(Y_test, prediction_on_test_data)
+
+
