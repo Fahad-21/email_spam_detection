@@ -91,4 +91,9 @@ input_data_features = feature_extraction.transform(input_mail)
 prediction = model.predict(input_data_features)
 print(prediction)
 
+if(prediction[0] == 1):
+    print("Ham mail")
+
+else:
+    print("Spam mail")
 
