@@ -79,4 +79,11 @@ print("Accuracy on traininf data: ", accuracy_on_training_data)
 prediction_on_test_data = model.predict(X_test_features)
 accuracy_on_test_data = accuracy_score(Y_test, prediction_on_test_data)
 
+#building  predictive system
+
+input_mail = input("Enter Email: ")
+
+#converting text to feature vectors
+input_data_features = feature_extraction.transform(input_mail)
+
 
