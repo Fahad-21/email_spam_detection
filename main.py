@@ -6,6 +6,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
 
+import os
+import pickle
+# Gmail API utils
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+# for encoding/decoding messages in base64
+import base64
+from base64 import urlsafe_b64decode, urlsafe_b64encode
+
+
 # Data PreProcessing
 # loading the data from csv file to pandas Dataframe.
 raw_mail_data = pd.read_csv('dataset.csv')
@@ -78,22 +89,23 @@ print("Accuracy on traininf data: ", accuracy_on_training_data)
 
 prediction_on_test_data = model.predict(X_test_features)
 accuracy_on_test_data = accuracy_score(Y_test, prediction_on_test_data)
+print("Accuracy on predictionf data: ", accuracy_on_training_data)
 
 #building  predictive system
 
-input_mail = input("Enter Email: ")
+input_mail = ["SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info"]
 
-#converting text to feature vectors
+# convert text to feature vectors
 input_data_features = feature_extraction.transform(input_mail)
 
-#making prediction
+# making prediction
 
 prediction = model.predict(input_data_features)
 print(prediction)
 
-if(prediction[0] == 1):
-    print("Ham mail")
+
+if (prediction[0]==1):
+  print('Ham mail')
 
 else:
-    print("Spam mail")
-
+  print('Spam mail')
