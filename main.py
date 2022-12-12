@@ -136,3 +136,5 @@ def gmail_authenticate():
 
 
 
+# get the Gmail API service
+service = gmail_authenticate()
