@@ -16,6 +16,7 @@ from google.auth.transport.requests import Request
 import base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
+
 def Model(mail):
     # Data PreProcessing
     # loading the data from csv file to pandas Dataframe.
@@ -93,7 +94,7 @@ def Model(mail):
 
     #building  predictive system
 
-    input_mail = ["SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info"]
+    input_mail = [mail]
 
     # convert text to feature vectors
     input_data_features = feature_extraction.transform(input_mail)
@@ -101,7 +102,7 @@ def Model(mail):
     # making prediction
 
     prediction = model.predict(input_data_features)
-    print(prediction)
+    #print(prediction)
 
 
     if (prediction[0]==1):
@@ -180,9 +181,9 @@ def parse_parts(service, parts, folder_name, message):
     """
 
     if parts:
-        print('a')
+       # print('a')
         for part in parts:
-            print('b')
+        #    print('b')
             filename = part.get("filename")
             mimeType = part.get("mimeType")
             body = part.get("body")
@@ -190,25 +191,25 @@ def parse_parts(service, parts, folder_name, message):
             file_size = body.get("size")
             part_headers = part.get("headers")
             if part.get("parts"):
-                print('c')
+                #print('c')
                 # recursively call this function when we see that a part
                 # has parts inside
                 parse_parts(service, part.get("parts"), folder_name, message)
             if mimeType == "text/plain":
-                print('d')
+                #print('d')
                 # if the email part is text plain
                 if data:
-                    print('e')
+                    #print('e')
                     text = urlsafe_b64decode(data).decode()
-                    print(text)
+                    #print(text)
             elif mimeType == "text/html":
-                print('f')
+                #print('f')
                 # if the email part is an HTML content
                 # save the HTML file and optionally open it in the browser
                 if not filename:
                     filename = "index.html"
                 filepath = os.path.join(folder_name, filename)
-                print("Saving HTML to", filepath)
+                #print("Saving HTML to", filepath)
                 with open(filepath, "wb") as f:
                     f.write(urlsafe_b64decode(data))
             else:
@@ -220,7 +221,7 @@ def parse_parts(service, parts, folder_name, message):
                         if "attachment" in part_header_value:
                             # we get the attachment ID
                             # and make another request to get the attachment itself
-                            print("Saving the file:", filename, "size:", get_size_format(file_size))
+                            #print("Saving the file:", filename, "size:", get_size_format(file_size))
                             attachment_id = body.get("attachmentId")
                             attachment = service.users().messages() \
                                         .attachments().get(id=attachment_id, userId='me', messageId=message['id']).execute()
@@ -245,12 +246,32 @@ def read_message(service, message):
     payload = msg['payload']
     # print("Payload", payload)
     headers = payload.get("headers")
-    # real_message = msg.get ( "payload" ).get ( "body" ).get ( "data" )
-    real_message = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-    print(real_message)
+    try:
+        parts = payload.get("parts")[0]
+        data = parts['body']['data']
+        data = data.replace("-", "+").replace("_", "/")
+        real_message = base64.urlsafe_b64decode(data).decode('utf-8')
+        r_m = real_message.replace('\n', '')
+        print(real_message, "/////////////////////////////////////////////////////////\n")
+        Model(real_message)
+    except:
+        real_message = msg.get("payload").get("body").get("data")
+        r_m = base64.urlsafe_b64decode(real_message).decode('utf-8')
+        Model(r_m)
+        pass
+
+
+   # real_message = msg.get("payload").get("body").get("data")
+
+    #real_message = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+    #print("real", real_message)
+
+
+
+
     parts = payload.get("parts")
     folder_name = "email"
-    print(parts)
+    #print(parts)
 
     has_subject = False
     if headers:
@@ -259,14 +280,18 @@ def read_message(service, message):
             # print("headert", header)
             name = header.get("name")
             value = header.get("value")
+
             if name.lower() == 'from':
                 # we print the From address
-                print("From:", value)
+     #           print("From:", value)
+                pass
             if name.lower() == "to":
                 # we print the To address
-                print("To:", value)
+                pass
+               # print("To:", value)
             if name.lower() == "subject":
                 # make our boolean True, the email has "subject"
+
                 has_subject = True
                 # make a directory with the name of the subject
                 folder_name = clean(value)
@@ -282,10 +307,11 @@ def read_message(service, message):
                     else:
                         folder_name = f"{folder_name}_{folder_counter}"
                 os.mkdir(folder_name)
-                print("Subject:", value)
+                #print("Subject:", value)
             if name.lower() == "date":
                 # we print the date when the message was sent
-                print("Date:", value)
+                #print("Date:", value)
+                pass
     if not has_subject:
         # if the email does not have a subject, then make a folder with "email" name
         # since folders are created based on subjects
@@ -297,6 +323,7 @@ def read_message(service, message):
 
 # get emails that match the query you specify
 results = search_messages(service, "Free")
+#print(results)
 print(f"Found {len(results)} results.")
 # for each email matched, read it (output plain/text to console & save HTML and attachments)
 for msg in results:
