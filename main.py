@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -15,7 +16,7 @@ from google.auth.transport.requests import Request
 import base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
-
+spam_mails = {}
 ids = []
 ready_to_delete = False
 
@@ -318,7 +319,10 @@ def read_message(service, message):
                         folder_name = f"{folder_name[:-3]}_{folder_counter}"
                     else:
                         folder_name = f"{folder_name}_{folder_counter}"
-                os.mkdir(folder_name)
+                try:
+                    os.mkdir(folder_name)
+                except:
+                    pass
                 #print("Subject:", value)
             if name.lower() == "date":
                 # we print the date when the message was sent
@@ -341,6 +345,3 @@ print(f"Found {len(results)} results.")
 # for each email matched, read it (output plain/text to console & save HTML and attachments)
 for msg in results:
     read_message(service, msg)
-
-ready_to_delete = True
-
