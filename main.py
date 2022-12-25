@@ -16,8 +16,12 @@ from google.auth.transport.requests import Request
 import base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
+spam_mails = {}
+ids = []
+ready_to_delete = False
 
-def Model(mail):
+def Model(mail, id):
+    global spam_mails
     # Data PreProcessing
     # loading the data from csv file to pandas Dataframe.
     raw_mail_data = pd.read_csv('dataset.csv')
@@ -109,7 +113,10 @@ def Model(mail):
       print('Ham mail')
 
     else:
+      #spam_mails[str(id)] = mail
+      ids.append(id)
       print('Spam mail')
+      return True
 
 # Request all access (permission to read/send/receive emails, manage the inbox, and more)
 SCOPES = ['https://mail.google.com/']
@@ -245,6 +252,7 @@ def read_message(service, message):
     # parts can be the message body, or attachments
     payload = msg['payload']
     # print("Payload", payload)
+    print('id', message['id'])
     headers = payload.get("headers")
     try:
         parts = payload.get("parts")[0]
@@ -252,12 +260,17 @@ def read_message(service, message):
         data = data.replace("-", "+").replace("_", "/")
         real_message = base64.urlsafe_b64decode(data).decode('utf-8')
         r_m = real_message.replace('\n', '')
-        print(real_message, "/////////////////////////////////////////////////////////\n")
-        Model(real_message)
+        result = Model(r_m, message['id'])
+        if result == True:
+            service.users().messages().delete(userId='me', id=message['id']).execute()
+            print("message deleted")
     except:
         real_message = msg.get("payload").get("body").get("data")
         r_m = base64.urlsafe_b64decode(real_message).decode('utf-8')
-        Model(r_m)
+        result = Model(r_m, message['id'])
+        if result == True:
+            service.users().messages().delete(userId='me', id=message['id']).execute()
+            print("message deleted")
         pass
 
 
@@ -320,6 +333,13 @@ def read_message(service, message):
     parse_parts(service, parts, folder_name, message)
     print("="*50)
 
+def delete_messages(service):
+    for id in ids:
+        print(id)
+        message_to_delete = service.users.messages().delete(userId="me", id=id).execute()
+
+    #message_to_delete = service.users.messages().delete(userId="me", id=msg['id'])
+
 
 # get emails that match the query you specify
 results = search_messages(service, "Free")
@@ -328,3 +348,7 @@ print(f"Found {len(results)} results.")
 # for each email matched, read it (output plain/text to console & save HTML and attachments)
 for msg in results:
     read_message(service, msg)
+
+ready_to_delete = True
+
+#delete_messages(service)
