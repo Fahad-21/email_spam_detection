@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -16,7 +15,7 @@ from google.auth.transport.requests import Request
 import base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
-spam_mails = {}
+
 ids = []
 ready_to_delete = False
 
@@ -333,12 +332,6 @@ def read_message(service, message):
     parse_parts(service, parts, folder_name, message)
     print("="*50)
 
-def delete_messages(service):
-    for id in ids:
-        print(id)
-        message_to_delete = service.users.messages().delete(userId="me", id=id).execute()
-
-    #message_to_delete = service.users.messages().delete(userId="me", id=msg['id'])
 
 
 # get emails that match the query you specify
@@ -351,4 +344,3 @@ for msg in results:
 
 ready_to_delete = True
 
-#delete_messages(service)
