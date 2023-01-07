@@ -346,3 +346,7 @@ print(f"Found {len(results)} results.")
 for msg in results:
     read_message(service, msg)
 
+    ready_to_delete = True
+
+    # delete_messages(service)
+
