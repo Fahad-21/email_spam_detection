@@ -345,3 +345,4 @@ print(f"Found {len(results)} results.")
 # for each email matched, read it (output plain/text to console & save HTML and attachments)
 for msg in results:
     read_message(service, msg)
+
